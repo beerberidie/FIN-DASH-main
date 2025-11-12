@@ -1,4 +1,5 @@
 """Category API endpoints."""
+
 from typing import List
 from fastapi import APIRouter, HTTPException
 
@@ -21,11 +22,11 @@ def list_categories():
 def get_category(category_id: str):
     """Get a single category by ID."""
     categories = csv_manager.read_csv("categories.csv")
-    
+
     for cat_data in categories:
-        if cat_data.get('id') == category_id:
+        if cat_data.get("id") == category_id:
             return Category.from_csv(cat_data)
-    
+
     raise HTTPException(status_code=404, detail="Category not found")
 
 
@@ -35,24 +36,24 @@ def create_category(category: CategoryCreate):
     # Generate ID and timestamp
     cat_id = generate_category_id(category.group, category.name)
     timestamp = now_iso()
-    
+
     # Check if category already exists
     categories = csv_manager.read_csv("categories.csv")
     for cat in categories:
-        if cat.get('id') == cat_id:
+        if cat.get("id") == cat_id:
             raise HTTPException(status_code=400, detail="Category already exists")
-    
+
     # Create category object
     cat_data = category.model_dump()
-    cat_data['id'] = cat_id
-    cat_data['created_at'] = timestamp
-    
+    cat_data["id"] = cat_id
+    cat_data["created_at"] = timestamp
+
     # Convert to CSV format
     cat_obj = Category(**cat_data)
-    
+
     # Append to CSV
     csv_manager.append_csv("categories.csv", cat_obj.to_csv(), CATEGORY_FIELDNAMES)
-    
+
     return cat_obj
 
 
@@ -60,22 +61,21 @@ def create_category(category: CategoryCreate):
 def delete_category(category_id: str):
     """Delete a custom category (system categories cannot be deleted)."""
     categories = csv_manager.read_csv("categories.csv")
-    
+
     # Find category and check if it's a system category
     for cat in categories:
-        if cat.get('id') == category_id:
-            if cat.get('is_system', 'false').lower() == 'true':
-                raise HTTPException(status_code=400, detail="Cannot delete system category")
+        if cat.get("id") == category_id:
+            if cat.get("is_system", "false").lower() == "true":
+                raise HTTPException(
+                    status_code=400, detail="Cannot delete system category"
+                )
             break
-    
+
     success = csv_manager.delete_csv_row(
-        "categories.csv",
-        category_id,
-        CATEGORY_FIELDNAMES
+        "categories.csv", category_id, CATEGORY_FIELDNAMES
     )
-    
+
     if not success:
         raise HTTPException(status_code=404, detail="Category not found")
-    
-    return None
 
+    return None

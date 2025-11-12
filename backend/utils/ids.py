@@ -1,4 +1,5 @@
 """ID generation utilities."""
+
 import uuid
 from datetime import datetime
 import hashlib
@@ -66,4 +67,3 @@ def generate_hash(*args) -> str:
     """Generate a hash from multiple arguments for deduplication."""
     combined = "|".join(str(arg) for arg in args)
     return hashlib.md5(combined.encode()).hexdigest()
-

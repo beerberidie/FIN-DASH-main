@@ -1,11 +1,17 @@
 """Currency and exchange rate API endpoints."""
+
 from typing import List, Optional
 from datetime import date as date_type
 from fastapi import APIRouter, HTTPException, Query, status
 
 from models.currency import (
-    Currency, CurrencyCreate, ExchangeRate, ExchangeRateCreate, ExchangeRateUpdate,
-    CurrencyConversion, CurrencyConversionResult
+    Currency,
+    CurrencyCreate,
+    ExchangeRate,
+    ExchangeRateCreate,
+    ExchangeRateUpdate,
+    CurrencyConversion,
+    CurrencyConversionResult,
 )
 from services.currency_service import currency_service
 
@@ -13,10 +19,12 @@ router = APIRouter(prefix="/currencies", tags=["currencies"])
 
 
 @router.get("", response_model=List[Currency])
-def list_currencies(active_only: bool = Query(False, description="Only return active currencies")):
+def list_currencies(
+    active_only: bool = Query(False, description="Only return active currencies")
+):
     """
     List all currencies.
-    
+
     Query Parameters:
     - **active_only**: If true, only return active currencies
     """
@@ -27,7 +35,7 @@ def list_currencies(active_only: bool = Query(False, description="Only return ac
 def get_currency(code: str):
     """
     Get a currency by code.
-    
+
     Path Parameters:
     - **code**: ISO 4217 currency code (e.g., ZAR, USD, EUR)
     """
@@ -38,7 +46,7 @@ def get_currency(code: str):
 def create_currency(currency_data: CurrencyCreate):
     """
     Create a new currency.
-    
+
     Request Body:
     - **code**: ISO 4217 currency code (3 letters)
     - **name**: Currency name
@@ -54,11 +62,11 @@ def list_exchange_rates(
     from_currency: Optional[str] = Query(None, description="Filter by source currency"),
     to_currency: Optional[str] = Query(None, description="Filter by target currency"),
     date_from: Optional[date_type] = Query(None, description="Filter by start date"),
-    date_to: Optional[date_type] = Query(None, description="Filter by end date")
+    date_to: Optional[date_type] = Query(None, description="Filter by end date"),
 ):
     """
     List exchange rates with optional filters.
-    
+
     Query Parameters:
     - **from_currency**: Filter by source currency code
     - **to_currency**: Filter by target currency code
@@ -69,7 +77,7 @@ def list_exchange_rates(
         from_currency=from_currency,
         to_currency=to_currency,
         date_from=date_from,
-        date_to=date_to
+        date_to=date_to,
     )
 
 
@@ -77,18 +85,20 @@ def list_exchange_rates(
 def get_exchange_rate(rate_id: str):
     """
     Get an exchange rate by ID.
-    
+
     Path Parameters:
     - **rate_id**: Exchange rate ID
     """
     return currency_service.get_exchange_rate(rate_id)
 
 
-@router.get("/exchange-rates/latest/{from_currency}/{to_currency}", response_model=ExchangeRate)
+@router.get(
+    "/exchange-rates/latest/{from_currency}/{to_currency}", response_model=ExchangeRate
+)
 def get_latest_exchange_rate(from_currency: str, to_currency: str):
     """
     Get the latest exchange rate between two currencies.
-    
+
     Path Parameters:
     - **from_currency**: Source currency code
     - **to_currency**: Target currency code
@@ -97,12 +107,14 @@ def get_latest_exchange_rate(from_currency: str, to_currency: str):
     if not rate:
         raise HTTPException(
             status_code=404,
-            detail=f"No exchange rate found for {from_currency} to {to_currency}"
+            detail=f"No exchange rate found for {from_currency} to {to_currency}",
         )
     return rate
 
 
-@router.post("/exchange-rates", response_model=ExchangeRate, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/exchange-rates", response_model=ExchangeRate, status_code=status.HTTP_201_CREATED
+)
 def create_exchange_rate(rate_data: ExchangeRateCreate):
     """
     Create a new exchange rate.
@@ -121,10 +133,10 @@ def create_exchange_rate(rate_data: ExchangeRateCreate):
 def update_exchange_rate(rate_id: str, rate_update: ExchangeRateUpdate):
     """
     Update an exchange rate.
-    
+
     Path Parameters:
     - **rate_id**: Exchange rate ID
-    
+
     Request Body:
     - **rate**: New exchange rate (optional)
     - **date**: New date (optional)
@@ -137,7 +149,7 @@ def update_exchange_rate(rate_id: str, rate_update: ExchangeRateUpdate):
 def delete_exchange_rate(rate_id: str):
     """
     Delete an exchange rate.
-    
+
     Path Parameters:
     - **rate_id**: Exchange rate ID
     """
@@ -149,15 +161,14 @@ def delete_exchange_rate(rate_id: str):
 def convert_currency(conversion: CurrencyConversion):
     """
     Convert an amount from one currency to another.
-    
+
     Request Body:
     - **amount**: Amount to convert
     - **from_currency**: Source currency code
     - **to_currency**: Target currency code
     - **date**: Date for the conversion (optional, uses latest rate if not provided)
-    
+
     Returns:
     - Conversion result with original amount, exchange rate, and converted amount
     """
     return currency_service.convert_currency(conversion)
-

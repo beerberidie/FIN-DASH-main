@@ -1,10 +1,12 @@
 """Settings model."""
+
 from typing import Dict
 from pydantic import BaseModel
 
 
 class BudgetRule(BaseModel):
     """Budget rule percentages."""
+
     needs: float = 0.50
     wants: float = 0.30
     savings: float = 0.20
@@ -13,6 +15,7 @@ class BudgetRule(BaseModel):
 
 class Settings(BaseModel):
     """Application settings."""
+
     currency: str = "ZAR"  # Deprecated: use base_currency instead
     base_currency: str = "ZAR"  # Primary currency for reporting and calculations
     locale: str = "en-ZA"
@@ -29,7 +32,6 @@ class Settings(BaseModel):
     theme: str = "system"
     created_at: str = ""
     updated_at: str = ""
-    
+
     class Config:
         from_attributes = True
-

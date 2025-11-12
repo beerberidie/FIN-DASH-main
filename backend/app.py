@@ -1,4 +1,5 @@
 """Main FastAPI application for FIN-DASH backend."""
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -6,8 +7,26 @@ from contextlib import asynccontextmanager
 import traceback
 
 from config import config
-from routers import transactions, categories, accounts, summary, budgets, goals, import_router, debts, reports, recurring, currency, investment, export, analytics, cards, demo
+from routers import (
+    transactions,
+    categories,
+    accounts,
+    summary,
+    budgets,
+    goals,
+    import_router,
+    debts,
+    reports,
+    recurring,
+    currency,
+    investment,
+    export,
+    analytics,
+    cards,
+    demo,
+)
 from services.scheduler import scheduler_service
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,7 +43,7 @@ app = FastAPI(
     title="FIN-DASH API",
     description="Personal Finance Dashboard API - CSV-based local-first application with automated recurring transactions",
     version="2.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Configure CORS
@@ -35,6 +54,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Global exception handler
 @app.exception_handler(Exception)
@@ -51,9 +71,9 @@ async def global_exception_handler(request: Request, exc: Exception):
     print(f"{'='*60}\n")
 
     return JSONResponse(
-        status_code=500,
-        content={"detail": f"{type(exc).__name__}: {str(exc)}"}
+        status_code=500, content={"detail": f"{type(exc).__name__}: {str(exc)}"}
     )
+
 
 # Include routers
 app.include_router(summary.router, prefix="/api")
@@ -81,7 +101,7 @@ def root():
         "name": "FIN-DASH API",
         "version": "2.0.0",
         "status": "running",
-        "docs": "/docs"
+        "docs": "/docs",
     }
 
 
@@ -93,15 +113,9 @@ def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     # Ensure data directory exists
     config.ensure_data_dir()
-    
-    # Run server
-    uvicorn.run(
-        "app:app",
-        host=config.APP_HOST,
-        port=config.APP_PORT,
-        reload=True
-    )
 
+    # Run server
+    uvicorn.run("app:app", host=config.APP_HOST, port=config.APP_PORT, reload=True)

@@ -1,11 +1,12 @@
 """Recurring transactions API router."""
+
 from fastapi import APIRouter, HTTPException, status
 from typing import List
 
 from models.recurring_transaction import (
-    RecurringTransaction, 
-    RecurringTransactionCreate, 
-    RecurringTransactionUpdate
+    RecurringTransaction,
+    RecurringTransactionCreate,
+    RecurringTransactionUpdate,
 )
 from services.recurring_service import recurring_service
 
@@ -16,7 +17,7 @@ router = APIRouter(tags=["recurring"])
 def get_recurring_transactions(active_only: bool = False):
     """
     Get all recurring transactions.
-    
+
     - **active_only**: If True, only return active recurring transactions
     """
     if active_only:
@@ -31,16 +32,20 @@ def get_recurring_transaction(recurring_id: str):
     if not recurring:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Recurring transaction {recurring_id} not found"
+            detail=f"Recurring transaction {recurring_id} not found",
         )
     return recurring
 
 
-@router.post("/recurring", response_model=RecurringTransaction, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/recurring",
+    response_model=RecurringTransaction,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_recurring_transaction(recurring_data: RecurringTransactionCreate):
     """
     Create a new recurring transaction.
-    
+
     Frequency options:
     - **daily**: Every day
     - **weekly**: Every week (specify day_of_week: 0=Monday, 6=Sunday)
@@ -52,20 +57,19 @@ def create_recurring_transaction(recurring_data: RecurringTransactionCreate):
     try:
         return recurring_service.create(recurring_data)
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @router.put("/recurring/{recurring_id}", response_model=RecurringTransaction)
-def update_recurring_transaction(recurring_id: str, update_data: RecurringTransactionUpdate):
+def update_recurring_transaction(
+    recurring_id: str, update_data: RecurringTransactionUpdate
+):
     """Update a recurring transaction."""
     recurring = recurring_service.update(recurring_id, update_data)
     if not recurring:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Recurring transaction {recurring_id} not found"
+            detail=f"Recurring transaction {recurring_id} not found",
         )
     return recurring
 
@@ -77,7 +81,7 @@ def delete_recurring_transaction(recurring_id: str):
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Recurring transaction {recurring_id} not found"
+            detail=f"Recurring transaction {recurring_id} not found",
         )
     return None
 
@@ -89,7 +93,7 @@ def toggle_recurring_transaction(recurring_id: str):
     if not recurring:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Recurring transaction {recurring_id} not found"
+            detail=f"Recurring transaction {recurring_id} not found",
         )
     return recurring
 
@@ -104,22 +108,17 @@ def get_due_recurring_transactions():
 def process_recurring_transactions():
     """
     Process all due recurring transactions and generate actual transactions.
-    
+
     This endpoint should be called periodically (e.g., daily) to generate
     transactions from recurring rules.
-    
+
     Returns the list of generated transactions.
     """
     try:
         generated = recurring_service.process_due_transactions()
-        return {
-            "success": True,
-            "count": len(generated),
-            "transactions": generated
-        }
+        return {"success": True, "count": len(generated), "transactions": generated}
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error processing recurring transactions: {str(e)}"
+            detail=f"Error processing recurring transactions: {str(e)}",
         )
-

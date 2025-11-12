@@ -1,4 +1,5 @@
 """Date utilities."""
+
 from datetime import datetime, date
 from typing import Optional
 
@@ -27,4 +28,3 @@ def parse_month(month_str: str) -> tuple[int, int]:
     """Parse month string (YYYY-MM) to year and month integers."""
     year, month = month_str.split("-")
     return int(year), int(month)
-
