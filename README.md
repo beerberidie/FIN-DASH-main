@@ -1,5 +1,10 @@
 # 💰 FIN-DASH - Personal Finance Dashboard
 
+![CI/CD Pipeline](https://github.com/beerberidie/FIN-DASH-main/actions/workflows/ci.yml/badge.svg)
+![Python](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11-blue)
+![Node.js](https://img.shields.io/badge/Node.js-18-green)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+
 **Version:** 2.0.0
 **Status:** Production Ready
 **Phase:** 3 - Advanced Automation & Analytics
